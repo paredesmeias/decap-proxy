@@ -1,10 +1,9 @@
 // test/index.spec.ts
-import { SELF, fetchMock } from 'cloudflare:test';
-import { describe, it, expect, beforeAll } from 'vitest';
+import { SELF } from 'cloudflare:test';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
-beforeAll(() => {
-	fetchMock.activate();
-	fetchMock.disableNetConnect();
+afterEach(() => {
+	vi.unstubAllGlobals();
 });
 
 describe('GET /', () => {
@@ -28,12 +27,18 @@ describe('GET /auth', () => {
 
 describe('GET /callback', () => {
 	it('responds with html page w/ JS messaging script', async () => {
-		fetchMock
-			.get('https://github.com')
-			.intercept({ path: '/login/oauth/access_token', method: 'POST' })
-			.reply(200, JSON.stringify({ access_token: 'some-access-token' }));
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async () =>
+				new Response(JSON.stringify({ access_token: 'some-access-token' }), {
+					headers: { 'Content-Type': 'application/json' },
+				})
+			)
+		);
 
-		const response = await SELF.fetch('https://example.com/callback?provider=github&code=some-authorization-code');
+		const response = await SELF.fetch(
+			'https://example.com/callback?provider=github&code=some-authorization-code'
+		);
 		expect(response.status).toBe(200);
 		const responseBody = await response.text();
 		expect(responseBody).toEqual(expect.stringContaining('window.opener.postMessage("authorizing:github", "*");'));
