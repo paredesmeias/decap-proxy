@@ -1,7 +1,7 @@
 #:schema node_modules/wrangler/config-schema.json
 
 # "compatibility_date" and "main" are values you are unlikely to need to change
-compatibility_date = "2025-11-17"     # schema version
+compatibility_date = "2024-04-19"     # schema version
 main = "src/index.ts"                 # entry point for the worker
 
 # The "name" parameter defines the name of the worker in your Cloudflare
@@ -18,12 +18,12 @@ name = "decap-proxy"
 #               <worker-name>.<account-name>.workers.dev
 #           where <worker-name> is the "name" parameter configured above.
 #
-# workers_dev = false
+# workers_dev = true
 
 # optional: this worker template uses Web Crypto API natively and doesn't require
 # nodejs_compat you can add this flag if you need Node.js polyfills,
 # but please be aware that those polyfills may have vulnerabilities
-# compatibility_flags = ["nodejs_compat"]
+compatibility_flags = ["nodejs_compat"]
 
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Docs:
